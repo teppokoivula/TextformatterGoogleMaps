@@ -29,7 +29,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
             'title' => __('Google Maps'), 
             'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
             'author' => 'Teppo Koivula',
-            'version' => 100
+            'version' => 101
         );
     }
     
@@ -109,7 +109,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
                 case "static":
                     $q = urlencode($matches[3][$key]);
                     $src = "https://maps.google.com/maps/api/staticmap?sensor=false"
-                         . "&center=$q&markers=$q&size={$this->width}x{$this->height}";
+                         . "&amp;center=$q&amp;markers=$q&amp;size={$this->width}x{$this->height}";
                     // See https://developers.google.com/maps/documentation/staticmaps/#api_key
                     // for details about getting and using Static Maps API key
                     if ($this->static_maps_api_key) $src .= "&amp;api_key=" . urlencode($this->static_maps_api_key);
