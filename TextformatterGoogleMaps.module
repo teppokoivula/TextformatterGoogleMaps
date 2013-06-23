@@ -24,84 +24,84 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
      *
      * @return array Module info
      */
-	public static function getModuleInfo() {
-		return array(
-			'title' => __('Google Maps'), 
-			'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
-			'author' => 'Teppo Koivula',
-			'version' => 100
+    public static function getModuleInfo() {
+        return array(
+            'title' => __('Google Maps'), 
+            'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
+            'author' => 'Teppo Koivula',
+            'version' => 100
         );
-	}
+    }
     
     /**
      * Default configuration settings
      *
      */
-	protected static $configDefaults = array(
-		'width' => 425, 
-		'height' => 350,
+    protected static $configDefaults = array(
+        'width' => 425, 
+        'height' => 350,
         'type' => 'iframe',
         'responsive' => true,
         'static_maps_api_key' => null,
         'gmb_client_id' => null,
         'gmb_private_key' => null
-	); 
+    ); 
 
-	/**
-	 * Data as used by the get/set functions
-	 *
-	 */
-	protected $data = array();
+    /**
+     * Data as used by the get/set functions
+     *
+     */
+    protected $data = array();
 
-	/**
-	 * Set our configuration defaults
-	 *
-	 */
-	public function __construct() {
-		foreach(self::$configDefaults as $key => $value) {
-			$this->set($key, $value); 
-		}
-	}	
+    /**
+     * Set our configuration defaults
+     *
+     */
+    public function __construct() {
+        foreach(self::$configDefaults as $key => $value) {
+            $this->set($key, $value); 
+        }
+    }    
 
-	/**
-	 * Make an iframe-based embed code responsive
-	 *
+    /**
+     * Make an iframe-based embed code responsive
+     *
      * @param string $out HTML markup for image or iframe
      * @return string HTML markup altered to be responsive
-	 */
-	protected function makeResponsive($out) {
+     */
+    protected function makeResponsive($out) {
         if ($this->type == "static") {
             $out = str_replace("<img ", "<img style='max-width:100%;height:auto' ", $out);
         } else {
             $out = str_replace("<iframe ", "<iframe style='position:absolute;top:0;left:0;width:100%;height:100%;' ", $out);
             $out = "<div class='TextFormatterGoogleMaps' style='position:relative;padding:30px 0 56.25% 0;height:0;overflow:hidden;'>$out</div>";
         }
-		return $out;
-	}
+        return $out;
+    }
 
-	/**
-	 * Text formatting function as used by the Textformatter interface
-	 *
-	 * Here we look for Google map URLs on first pass using a fast strpos() function.
-	 * When found, we do our second pass with preg_match_all and replace the map URLs
-	 * with the proper embed codes.
-	 *
+    /**
+     * Text formatting function as used by the Textformatter interface
+     *
+     * Here we look for Google map URLs on first pass using a fast strpos() function.
+     * When found, we do our second pass with preg_match_all and replace the map URLs
+     * with the proper embed codes.
+     *
      * @param string &$str Field content
-	 */
-	public function format(&$str) {
+     */
+    public function format(&$str) {
 
         // fast strpos check for Google Maps URLs
-		if (strpos($str, '://maps.google.') === false) return;
+        if (strpos($str, '://maps.google.') === false) return;
 
         // comprehensive preg_match_all check + capture matches to $matches
-		if (!preg_match_all('#<p>\s*(https?://maps.google.[a-z]+/maps\?)(.*?(?:(?:\?|&amp;)q=([^&<]+).*?))</p>#si', $str, $matches)) return;
+        if (!preg_match_all('#<p>\s*(https?://maps.google.[a-z]+/maps\?)(.*?(?:(?:\?|&amp;)q=([^&<]+).*?))</p>#si', $str, $matches)) return;
 
         // make sure that we've got proper dimensions for embedded maps
         if (!$this->width || $this->width < 1) $this->width = self::$configDefaults['width'];
         if (!$this->height || $this->height < 1) $this->height = self::$configDefaults['height'];
 
         // iterate over found matches
-		foreach($matches[0] as $key => $value) { 
+        foreach($matches[0] as $key => $value) { 
 
             // type is configured via module settings and can be "static" (for
             // static image embed method) or "iframe" (for iframe embed method)
@@ -137,34 +137,34 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
 
             // replace original link ($line) with new embed code ($out)
             $str = str_replace($value, $out, $str); 
-		}
-	}
+        }
+    }
 
-	/**
-	 * Module configuration screen
-	 *
+    /**
+     * Module configuration screen
+     *
      * @param array $data
      * @return InputfieldWrapper
-	 */
-	public static function getModuleConfigInputfields(array $data) {
+     */
+    public static function getModuleConfigInputfields(array $data) {
 
-		foreach(self::$configDefaults as $key => $value) {
-			if(!isset($data[$key])) $data[$key] = $value;
-		}
+        foreach(self::$configDefaults as $key => $value) {
+            if(!isset($data[$key])) $data[$key] = $value;
+        }
 
-		$fields = new InputfieldWrapper();
+        $fields = new InputfieldWrapper();
 
-		$field = wire('modules')->get('InputfieldSelect'); 
-		$field->name = 'type';
-		$field->value = $data['type']; 
+        $field = wire('modules')->get('InputfieldSelect'); 
+        $field->name = 'type';
+        $field->value = $data['type']; 
         $field->required = true;
         $field->options = array(
             'iframe' => 'iframe',
             'static' => 'static'
         );
-		$field->label = __('Map Type'); 
+        $field->label = __('Map Type'); 
         $field->description = __("Embed type should be selected based on your use case. Please note that Google enforces usage limits on static maps, see [Static Maps API Developer Guide](https://developers.google.com/maps/documentation/staticmaps/#Limits) for details.");
-		$fields->add($field);
+        $fields->add($field);
 
         $field = wire('modules')->get("InputfieldText");
         $field->name = 'static_maps_api_key';
@@ -173,32 +173,32 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
         $field->description = __("API key for Static Maps, see [Static Maps API Developer Guide](https://developers.google.com/maps/documentation/staticmaps/#api_key) for details. This isn't strictly necessary, but makes it possible to track usage and buy more quota.");
         $fields->add($field);
 
-		$field = wire('modules')->get('InputfieldCheckbox'); 
-		$field->name = 'responsive';
-		$field->value = true;
-		if ($data['responsive']) $field->checked = true;
-		$field->label = __('Use Responsive Embed Method?'); 
-		$field->description = __('When checked, maps will be embedded in a manner that allows them to be presented in a width-flexible format.'); 
-		$fields->add($field); 
+        $field = wire('modules')->get('InputfieldCheckbox'); 
+        $field->name = 'responsive';
+        $field->value = true;
+        if ($data['responsive']) $field->checked = true;
+        $field->label = __('Use Responsive Embed Method?'); 
+        $field->description = __('When checked, maps will be embedded in a manner that allows them to be presented in a width-flexible format.'); 
+        $fields->add($field); 
 
         $fieldset = wire('modules')->get('InputfieldFieldset');
         $fieldset->label = __("Default dimensions");
         $fieldset->description = __("Default dimensions for embedded maps. If responsive embed method is checked, these are used as max dimensions by static maps and ignored by iframe maps.");
         $fieldset->notes = __("Since dimensions are required especially for static maps to work at all, dimension settings should be filled in and both of them must be larger than zero. If left blank, module defaults will be used instead.");
 
-		$field = wire('modules')->get('InputfieldInteger'); 
-		$field->name = 'width';
-		$field->value = ($data['width'] && $data['width'] > 0) ? $data['width'] : self::$configDefaults['width'];
-		$field->label = __('Width');
+        $field = wire('modules')->get('InputfieldInteger'); 
+        $field->name = 'width';
+        $field->value = ($data['width'] && $data['width'] > 0) ? $data['width'] : self::$configDefaults['width'];
+        $field->label = __('Width');
         $field->columnWidth = 50;
-		$fieldset->add($field); 
+        $fieldset->add($field); 
 
-		$field = wire('modules')->get('InputfieldInteger'); 
-		$field->name = 'height';
-		$field->value = ($data['height'] && $data['height'] > 0) ? $data['height'] : self::$configDefaults['height'];
-		$field->label = __('Height');
+        $field = wire('modules')->get('InputfieldInteger'); 
+        $field->name = 'height';
+        $field->value = ($data['height'] && $data['height'] > 0) ? $data['height'] : self::$configDefaults['height'];
+        $field->label = __('Height');
         $field->columnWidth = 50;
-		$fieldset->add($field); 
+        $fieldset->add($field); 
 
         $fields->add($fieldset);
 
@@ -207,49 +207,49 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
         if (!$data['client'] && !$data['signature']) $fieldset->collapsed = Inputfield::collapsedYes;
         $fieldset->description = __("Google Maps for Business client ID and private key. Only applies to 'static' embed method. See [Maps API for Business documentation](https://developers.google.com/maps/documentation/business/webservices#business_specific_parameters) for details.");
 
-		$field = wire('modules')->get('InputfieldText'); 
-		$field->name = 'gmb_client_id';
-		$field->value = $data['gmb_client_id'];
-		$field->label = __('Client ID');
+        $field = wire('modules')->get('InputfieldText'); 
+        $field->name = 'gmb_client_id';
+        $field->value = $data['gmb_client_id'];
+        $field->label = __('Client ID');
         $field->notes = __("Include the 'gme-' prefix in your client ID");
-		$fieldset->add($field);
+        $fieldset->add($field);
 
-		$field = wire('modules')->get('InputfieldText'); 
-		$field->name = 'gmb_private_key';
-		$field->value = $data['gmb_private_key'];
-		$field->label = __('Private key');
+        $field = wire('modules')->get('InputfieldText'); 
+        $field->name = 'gmb_private_key';
+        $field->value = $data['gmb_private_key'];
+        $field->label = __('Private key');
         $field->notes = __("Please note that your private key, if added here, will be saved as plain text in your database. Google's documentation explicitly states that the private key should not be \"stored on any websites\". Use this feature at your own risk and only if you're fully aware of the risks involved!");
-		$fieldset->add($field);
+        $fieldset->add($field);
 
         $fields->add($fieldset);
 
-		return $fields;
-	}
+        return $fields;
+    }
 
-	/**
-	 * The following functions are to support the ConfigurableModule interface
-	 * since Textformatter does not originate from WireData
-	 *
-	 */
+    /**
+     * The following functions are to support the ConfigurableModule interface
+     * since Textformatter does not originate from WireData
+     *
+     */
 
-	public function set($key, $value) {
-		$this->data[$key] = $value; 
-		return $this;
-	}
+    public function set($key, $value) {
+        $this->data[$key] = $value; 
+        return $this;
+    }
 
-	public function get($key) {
-		$value = Wire::getFuel($key); 
-		if($value) return $value; 
-		return isset($this->data[$key]) ? $this->data[$key] : null;
-	}
+    public function get($key) {
+        $value = Wire::getFuel($key); 
+        if($value) return $value; 
+        return isset($this->data[$key]) ? $this->data[$key] : null;
+    }
 
-	public function __set($key, $value) {
-		$this->set($key, $value); 
-	}
+    public function __set($key, $value) {
+        $this->set($key, $value); 
+    }
 
-	public function __get($key) {
-		return $this->get($key);
-	}
+    public function __get($key) {
+        return $this->get($key);
+    }
     
     /**
      * Get Google Maps for Business signature
