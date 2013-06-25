@@ -30,7 +30,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
             'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
             'href' => 'http://modules.processwire.com/modules/textformatter-google-maps/',
             'author' => 'Teppo Koivula',
-            'version' => 111
+            'version' => 112
         );
     }
     
@@ -95,7 +95,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
         if (strpos($str, '://maps.google.') === false) return;
 
         // comprehensive preg_match_all check + capture matches to $matches
-        if (!preg_match_all('#<p>\s*(https?://maps.google.[a-z]+/maps\?)(.*?(?:(?:\?|&amp;)q=([^&<]+).*?))</p>#si', $str, $matches)) return;
+        if (!preg_match_all('#<p>\s*https?:(//maps.google.[a-z]+/maps)\?(.*?(?:(?:\?|&amp;)q=([^&<]+).*?))</p>#si', $str, $matches)) return;
 
         // make sure that we've got proper dimensions for embedded maps
         if (!$this->width || $this->width < 1) $this->width = self::$configDefaults['width'];
@@ -117,7 +117,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
             switch ($this->type) {
                 case "static":
                     $q = urlencode($matches[3][$key]);
-                    $src = "https://maps.google.com/maps/api/staticmap?sensor=false"
+                    $src = $matches[1][$key] . "/api/staticmap?sensor=false"
                          . "&amp;center=$q&amp;markers=$q&amp;size={$this->width}x{$this->height}";
                     if ($z) $src .= "&amp;zoom=$z";
                     // See https://developers.google.com/maps/documentation/staticmaps/#api_key
@@ -133,7 +133,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
                     break;
 
                 case "iframe":
-                    $src = $matches[1][$key] . str_replace("'", "%27", $matches[2][$key]) . "&amp;output=embed";
+                    $src = $matches[1][$key] . "?" . str_replace("'", "%27", $matches[2][$key]) . "&amp;output=embed";
                     if ($z) $src .= "&amp;zoom=$z";
                     $out = "<iframe frameborder='0' scrolling='no' marginheight='0' marginwidth='0'"
                          . " width='{$this->width}' height='{$this->height}' src='$src'></iframe>";
