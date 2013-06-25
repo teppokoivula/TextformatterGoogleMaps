@@ -28,8 +28,9 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
         return array(
             'title' => __('Google Maps'), 
             'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
+            'href' => 'http://modules.processwire.com/modules/textformatter-google-maps/',
             'author' => 'Teppo Koivula',
-            'version' => 110
+            'version' => 111
         );
     }
     
