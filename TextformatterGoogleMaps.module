@@ -30,7 +30,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
             'summary' => __('Enter a full Google Maps link by itself in any paragraph and this will automatically convert it to an embedded map. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.'),
             'href' => 'http://modules.processwire.com/modules/textformatter-google-maps/',
             'author' => 'Teppo Koivula',
-            'version' => 112
+            'version' => 113
         );
     }
     
@@ -95,7 +95,7 @@ class TextformatterGoogleMaps extends Textformatter implements ConfigurableModul
         if (strpos($str, '://maps.google.') === false) return;
 
         // comprehensive preg_match_all check + capture matches to $matches
-        if (!preg_match_all('#<p>\s*https?:(//maps.google.[a-z]+/maps)\?(.*?(?:(?:\?|&amp;)q=([^&<]+).*?))</p>#si', $str, $matches)) return;
+        if (!preg_match_all('#<p>\s*https?:(//maps.google.[a-z]+/maps)\?(.*?(?:(?:&amp;)?q=([^&<]+).*?))</p>#si', $str, $matches)) return;
 
         // make sure that we've got proper dimensions for embedded maps
         if (!$this->width || $this->width < 1) $this->width = self::$configDefaults['width'];
