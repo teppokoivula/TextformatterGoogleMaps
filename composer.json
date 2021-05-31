@@ -1,0 +1,23 @@
+{
+    "name": "teppokoivula/textformatter-google-maps",
+    "type": "pw-module",
+    "description": "ProcessWire CMS/CMF module for converting Google Maps links to embedded maps.",
+    "keywords": [
+        "module",
+        "processwire"
+    ],
+    "homepage": "https://github.com/teppokoivula/TextformatterGoogleMaps",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Teppo Koivula",
+            "homepage": "https://github.com/teppokoivula",
+            "email": "teppo.koivula@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "processwire/processwire": ">=2.3.1",
+        "wireframe-framework/processwire-composer-installer": "^1.0.0"
+    }
+}
